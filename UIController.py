@@ -1,6 +1,6 @@
 import os
 #from termcolor import colored
-from ColorizeText import colored
+from External_Packages.ColorizeText import colored
 
 
 clearConsole = lambda: os.system('cls' if os.name in ('nt', 'dos') else 'clear')
