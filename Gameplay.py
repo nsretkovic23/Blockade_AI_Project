@@ -1,5 +1,5 @@
 from UIController import clearConsole, printGameMatrix
-from GameManager import GameState, getBeginningState
+from GameManager import GameState, getBeginningState, serializeTurn, playTurn
 from External_Packages.ColorizeText import colored
 from Cheats import loadDefaultGameplay
 
@@ -14,6 +14,12 @@ positionInput = 0
 # CHEAT - LOAD DEFAULT GAME INSTANTLY FOR TESTING
 defaultGame = loadDefaultGameplay()
 printGameMatrix(defaultGame)
+
+turn = serializeTurn()
+playTurn(defaultGame, turn)
+printGameMatrix(defaultGame)
+
+# Format: [["X1"], [5,7], ["h", 3,4]]
 
 
 
