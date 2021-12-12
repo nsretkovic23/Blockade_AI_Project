@@ -1,6 +1,8 @@
+from os import truncate
 from External_Packages.ColorizeText import colored
 from NewGameGenerator import CreateNewGame
 from PawnMovementController import setNewPawnPosition, getPawnsCurrentPosition, markStartingPosition, canPawnMoveThere
+from WallPlacingController import tryToPlaceHorizontalWall, tryToPlaceVerticalWall
 
 class GameState:
      def __init__(self):
@@ -70,7 +72,7 @@ def playTurn(state:GameState):
     column = 0
 
     while(player != "X1" and player != "X2" and player != "O1" and player != "O2"):
-        player = input("Select player: ")
+        player = input("Select player: ").upper()
 
     while(isMoveValid is False):
         if(row < 1 or row > state.rows):
@@ -105,11 +107,32 @@ def playTurn(state:GameState):
                 isMoveValid = False
                 row = 0
                 column = 0
+    while(isWallValid is False):
+        # TODO: Check if has walls left
+        wallType = ""
+        wallType = input("Select wall, Type v/h : ").lower()
+        wallRow = 0
+        wallCol = 0
+        asciiToNumber = ord(input(colored("Select wall's starting row: ", 'cyan')).upper())
+        wallRow = asciiToNumber - 48 if (asciiToNumber < 58) else asciiToNumber - 55
+        asciiToNumber = ord(input(colored("Select wall's starting column: ", 'cyan')).upper())
+        wallCol = asciiToNumber - 48 if (asciiToNumber < 58) else asciiToNumber - 55
 
-    # TODO: Check if has walls left
-    wall.append(input("Select wall, Type v/h : ").lower())
-    wall.append(int(input("Select wall's starting row: ")))
-    wall.append(int(input("Select wall's starting column: ")))
+        if wallType == "h":
+            # If wall inputs are correct, try to place the wall
+            # state.cols - 1 => you can place horizontal wall only on second-to-last column
+            if(wallRow > 0 and wallRow < state.rows and wallCol < state.cols-1 and wallCol > 0):
+                if tryToPlaceHorizontalWall(state, [wallRow, wallCol]) == True:
+                    isWallValid = True
+                else:
+                    isWallValid = False
+        if wallType == "v":
+            if(wallRow > 0 and wallRow < state.rows - 1 and wallCol >0 and wallCol < state.rows):
+                if tryToPlaceVerticalWall(state, [wallRow, wallCol]) == True:
+                    isWallValid = True
+                else:
+                    isWallValid = False
+
     return [[player], move, wall]
 
 
@@ -125,8 +148,17 @@ def exectuteTurn(state:GameState, turn):
 
     setNewPawnPosition(turn[0][0], state, turn[1])
 
-    # TODO: Needs only one more check if there is a wall
-    if(turn[2][0] == "h"):
-        state.hWalls[turn[2][1]][turn[2][2]] = "=="
-        state.hWalls[turn[2][1]][turn[2][2]+1] = "=="
-
+def isGameOver(state:GameState):
+    if(state.x1Pos == state.o1StartingPos
+    or state.x1Pos == state.o2StartingPos
+    or state.x2Pos == state.o1StartingPos
+    or state.x2Pos == state.o2StartingPos):
+        print(colored("X IS A WINNER, CONGRATS!!!", 'green', attrs=['bold']))
+        return True
+    elif(state.o1Pos == state.x1StartingPos
+      or state.o1Pos == state.x2StartingPos
+      or state.o2Pos == state.x1StartingPos
+      or state.o2Pos == state.x2StartingPos):
+      print(colored("X IS A WINNER, CONGRATS!!!",'green', attrs=['bold']))
+      return True
+    return False
