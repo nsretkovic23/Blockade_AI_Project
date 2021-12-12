@@ -1,3 +1,4 @@
+from os import error
 from NewGameGenerator import CreateNewGame
 
 class GameState:
@@ -55,4 +56,46 @@ def setPawnsOnStartingPositions(playingFields, xPos, oPos):
             playingFields[xPos[i][0]][xPos[i][1]] = f"X{i+1}"
         else:
             playingFields[oPos[i%2][0]][oPos[i%2][1]] = f"O{i+1}"
-            
+
+# TODO: Move: checkIfCanMove, checkIfCanPlaceWall
+# Format: [["X1"], [5,7], ["h", 3,4]]
+def playTurn(state:GameState, turn):
+    currentPosition = []
+    if(turn[0][0] == "X1"):
+        currentPosition = state.x1Pos
+    elif(turn[0][0] == "X2"):
+        currentPosition = state.x2Pos
+    elif(turn[0][0] == "O1"):
+        currentPosition = state.o1Pos
+    elif(turn[0][0] == "O2"):
+        currentPosition = state.o2Pos
+    else:
+        error("Wrong pawn")
+    state.playingFields[currentPosition[0]][currentPosition[1]] = "  "
+
+    state.playingFields[turn[1][0]][turn[1][1]] = turn[0][0]
+
+    # TODO: Needs only one more check if there is a wall
+    if(turn[2][0] == "h" and turn[2][1] > 0 and turn[2][1] <= state.rows and turn[2][2] < state.cols-1 and turn[2][2] > 0):
+        state.hWalls[turn[2][1]][turn[2][2]] = "=="
+        state.hWalls[turn[2][1]][turn[2][2]+1] = "=="
+
+# TODO: Implement checkers to give an error before it goes to playTurn
+#       Rename this to playTurn and playTurn to Execute Turn
+def serializeTurn():
+    move = []
+    player = ""
+    wall = []
+
+    while(player != "X1" and player != "X2" and player != "O1" and player != "O2"):
+        player = input("Select player: ")
+
+    # TODO: Checkers if out of row/col
+    row = int(input("Select row: "))
+    column = int(input("Select column: "))
+    move = [row, column]
+    # TODO: Check if has walls left
+    wall.append(input("Select wall, Type v/h : ").lower())
+    wall.append(int(input("Select wall's starting row: ")))
+    wall.append(int(input("Select wall's starting column: ")))
+    return [[player], move, wall]
