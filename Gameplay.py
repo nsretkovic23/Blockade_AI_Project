@@ -1,5 +1,5 @@
 from UIController import clearConsole, printGameMatrix
-from GameManager import GameState, getBeginningState, serializeTurn, playTurn
+from GameManager import GameState, getBeginningState, exectuteTurn, playTurn
 from External_Packages.ColorizeText import colored
 from Cheats import loadDefaultGameplay
 
@@ -11,14 +11,17 @@ xPositions = []
 oPositions = []
 positionInput = 0
 
+clearConsole()
+
+
 # CHEAT - LOAD DEFAULT GAME INSTANTLY FOR TESTING
 defaultGame = loadDefaultGameplay()
 printGameMatrix(defaultGame)
 
-turn = serializeTurn()
-playTurn(defaultGame, turn)
-printGameMatrix(defaultGame)
-
+while(True):
+    turn = playTurn(defaultGame)
+    exectuteTurn(defaultGame, turn)
+    printGameMatrix(defaultGame)
 # Format: [["X1"], [5,7], ["h", 3,4]]
 
 
@@ -70,6 +73,11 @@ for i in range (0,4):
     positionInput = 0
 
 state = getBeginningState(whoPlaysFirst, numberOfWalls, rows, cols, xPositions, oPositions)
+
+while(True):
+    turn = playTurn(state)
+    exectuteTurn(state, turn)
+    printGameMatrix(state)
 
 printGameMatrix(state)
 print("success")
