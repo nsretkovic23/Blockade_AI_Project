@@ -28,10 +28,10 @@ def setNewPawnPosition(pawn:str, state, position:list):
 
 # TODO: Check if there are walls on the way!
 def canPawnMoveThere(pawnCurrentPosition, row, column):
-    if((pawnCurrentPosition[0] == row and pawnCurrentPosition[1]+2 == column)
-       or (pawnCurrentPosition[0] == row and pawnCurrentPosition[1]-2 == column)
-       or (pawnCurrentPosition[0] + 2 == row and pawnCurrentPosition[1] == column)
-       or (pawnCurrentPosition[0] - 2 == row and pawnCurrentPosition[1] == column)
+    if((   pawnCurrentPosition[0]     == row and pawnCurrentPosition[1]+2 == column)
+       or (pawnCurrentPosition[0]     == row and pawnCurrentPosition[1]-2 == column)
+       or (pawnCurrentPosition[0] + 2 == row and pawnCurrentPosition[1]   == column)
+       or (pawnCurrentPosition[0] - 2 == row and pawnCurrentPosition[1]   == column)
        or (pawnCurrentPosition[0] + 1 == row and pawnCurrentPosition[1]+1 == column)
        or (pawnCurrentPosition[0] + 1 == row and pawnCurrentPosition[1]-1 == column)
        or (pawnCurrentPosition[0] - 1 == row and pawnCurrentPosition[1]-1 == column)
@@ -41,6 +41,7 @@ def canPawnMoveThere(pawnCurrentPosition, row, column):
     else:
         return False
 
+# TODO: Fix logic for marking starting positions because when pawn is returning to its start pos, it is being overwriten with XS/OS 
 # Execute this function to set starting positions to XS / OS if pawn moved from it's starting pos
 def markStartingPosition(pawn, currentPosition:list, state):
     if(pawn == "X1"):

@@ -75,38 +75,39 @@ def playTurn(state:GameState):
         player = input("Select player: ").upper()
 
     while(isMoveValid is False):
-        if(row < 1 or row > state.rows):
-            if isFirstInputDoneAlready is True:
-                print(colored("Wrong positions, try again!", 'red'))
 
+        if(row < 1 or row > state.rows):
+            #if isFirstInputDoneAlready is True:
+             #   print(colored("Wrong positions, try again!", 'red'))
             asciiToNumber = ord(input(colored("Select row: ", 'cyan')).upper())
             row = asciiToNumber - 48 if (asciiToNumber < 58) else asciiToNumber - 55
-            
-            isFirstInputDoneAlready = True
-        else:
-            move.append(row)
+            #isFirstInputDoneAlready = True
+        #else:
+        #    move.append(row)
 
         if(column < 1 or column > state.cols):
            
             asciiToNumber = ord(input(colored("Select column: ", 'cyan')).upper())
             column = asciiToNumber - 48 if (asciiToNumber < 58) else asciiToNumber - 55
         
-        else:
-            move.append(column)
+        #else:
+        #    move.append(column)
             # Assume that move is valid because cols and rows are in dimensions range:
             isMoveValid = True
-
 
         pawnCurrentPosition = getPawnsCurrentPosition(player, state)
 
         if isMoveValid is True:
             if canPawnMoveThere(pawnCurrentPosition, row, column) is True:
                 isMoveValid = True
+                move.append(row)
+                move.append(column)
             else:
                 print(colored("You can't move there, try again!", 'red', attrs=['bold']))
                 isMoveValid = False
                 row = 0
                 column = 0
+
     while(isWallValid is False):
         # TODO: Check if has walls left
         wallType = ""
@@ -121,13 +122,13 @@ def playTurn(state:GameState):
         if wallType == "h":
             # If wall inputs are correct, try to place the wall
             # state.cols - 1 => you can place horizontal wall only on second-to-last column
-            if(wallRow > 0 and wallRow < state.rows and wallCol < state.cols-1 and wallCol > 0):
+            if(wallRow > 0 and wallRow < state.rows and wallCol < state.cols and wallCol > 0):
                 if tryToPlaceHorizontalWall(state, [wallRow, wallCol]) == True:
                     isWallValid = True
                 else:
                     isWallValid = False
         if wallType == "v":
-            if(wallRow > 0 and wallRow < state.rows - 1 and wallCol >0 and wallCol < state.rows):
+            if(wallRow > 0 and wallRow < state.rows and wallCol >0 and wallCol < state.rows):
                 if tryToPlaceVerticalWall(state, [wallRow, wallCol]) == True:
                     isWallValid = True
                 else:
