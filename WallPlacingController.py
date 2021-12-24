@@ -3,7 +3,12 @@ from External_Packages.ColorizeText import colored
 #TODO: Phase 2 -> check if you are closing every path to a player
 
 def tryToPlaceHorizontalWall(state, wallPos):
-    if(state.hWalls[wallPos[0]][wallPos[1]] == "==" or state.hWalls[wallPos[0]][wallPos[1]+1] == "=="):
+    if(state.hWalls[wallPos[0]][wallPos[1]] == "==" 
+    or state.hWalls[wallPos[0]][wallPos[1]+1] == "=="
+    or wallPos[0] < 1
+    or wallPos[0] >= state.rows
+    or wallPos[1] < 1
+    or wallPos[1] >= state.cols):
         print(colored("You can't place the wall here, try again!",'red', attrs=['bold']))
         return False
     else:
@@ -11,9 +16,14 @@ def tryToPlaceHorizontalWall(state, wallPos):
         state.hWalls[wallPos[0]][wallPos[1]+1] = "=="
         return True
 
+# FORMAT: wallpos [row, col]
 def tryToPlaceVerticalWall(state, wallPos):
     if(state.vWalls[wallPos[0]][wallPos[1]] == "\u01c1"
-    or state.vWalls[wallPos[0]+1][wallPos[1]] == "\u01c1"):
+    or state.vWalls[wallPos[0]+1][wallPos[1]] == "\u01c1"
+    or wallPos[0] < 1
+    or wallPos[0] >= state.rows
+    or wallPos[1] < 1
+    or wallPos[1] >= state.cols):
         print(colored("You can't place the wall here, try again!",'red', attrs=['bold']))
         return False
     else:
