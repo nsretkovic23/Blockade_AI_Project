@@ -42,7 +42,7 @@ def canPawnMoveThere(pawnCurrentPosition, row, column):
         return False
 
 # TODO: Fix logic for marking starting positions because when pawn is returning to its start pos, it is being overwriten with XS/OS 
-# Execute this function to set starting positions to XS / OS if pawn moved from it's starting pos
+# Call this function to set starting positions to XS / OS if pawn moved from it's starting pos
 def markStartingPosition(pawn, currentPosition:list, state):
     if(pawn == "X1"):
         if(state.x1StartingPos != currentPosition or state.x1StartingPos == state.x1Pos):

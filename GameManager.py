@@ -8,19 +8,30 @@ class GameState:
      def __init__(self):
        self.playerSign = ""
        self.cpuSign = ""
-       self.player_H_Walls = 0
-       self.player_V_Walls = 0
-       self.cpu_H_Walls = 0
-       self.cpu_V_Walls = 0
+       self.turn = ""
+       self.walls = {}
+       # FORMAT: 'X' : [[horizontal], [vertical]]
+       self.walls['X'] = []
+       self.walls['O'] = []
        self.rows = 0
        self.cols = 0
        self.playingFields = []
        self.hWalls = []
        self.vWalls = []
+       self.startingPositions = {}
+       self.startingPositions["X1"] = []
+       self.startingPositions["X2"] = []
+       self.startingPositions["O1"] = []
+       self.startingPositions["O2"] = []
        self.x1StartingPos = []
        self.x2StartingPos = []
        self.o1StartingPos = []
        self.o2StartingPos = []
+       self.positions = {}
+       self.positions["X1"] = []
+       self.positions["X2"] = []
+       self.positions["O1"] = []
+       self.positions["O2"] = []
        self.x1Pos = []
        self.x2Pos = []
        self.o1Pos = []
@@ -31,10 +42,9 @@ def getBeginningState(whoPlaysFirst, numberOfWalls, rows, cols, xPos, oPos):
     state = GameState()
     state.playerSign = "X" if whoPlaysFirst == "me" else "O"
     state.cpuSign = "X" if whoPlaysFirst == "cpu" else "O"
-    state.player_H_Walls  = numberOfWalls
-    state.player_V_Walls = numberOfWalls
-    state.cpu_H_Walls = numberOfWalls
-    state.cpu_V_Walls = numberOfWalls
+    state.turn = "X"
+    state.walls['X'] = [numberOfWalls, numberOfWalls]
+    state.walls['O'] = [numberOfWalls, numberOfWalls]
     state.rows = rows
     state.cols = cols
     matrices = CreateNewGame(rows, cols)
@@ -63,37 +73,48 @@ def setPawnsOnStartingPositions(playingFields, xPos, oPos):
 def playTurn(state:GameState):
     move = []
     player = ""
+    playerNumber = 0
     pawnCurrentPosition = []
     wall = []
     isMoveValid = False
     isWallValid = False
-    isFirstInputDoneAlready = False
     row = 0
     column = 0
 
-    while(player != "X1" and player != "X2" and player != "O1" and player != "O2"):
-        player = input("Select player: ").upper()
+    #while(player != "X1" and player != "X2" and player != "O1" and player != "O2"):
+    #    player = input("Select player: ").upper()
+    print(colored(f"\n{state.turn} plays:", 'green', attrs=['bold']))
+    print(colored(f"Remaining horizontal walls: {state.walls[state.turn][0]}", 'magenta', attrs=['bold']))
+    print(colored(f"Remaining vertical walls: {state.walls[state.turn][1]}", 'magenta', attrs=['bold']))
 
+
+    while(playerNumber != 1 and playerNumber != 2):
+        try:
+            playerNumber = int(input("Select pawn (1/2): "))
+        except:
+            print(colored("Invalid input", 'red', attrs=['bold']))
+
+    player = state.turn + str(playerNumber)
+
+    # PLAYER MOVEMENT -----------------------------------------------------------------------
     while(isMoveValid is False):
 
         if(row < 1 or row > state.rows):
-            #if isFirstInputDoneAlready is True:
-             #   print(colored("Wrong positions, try again!", 'red'))
-            asciiToNumber = ord(input(colored("Select row: ", 'cyan')).upper())
-            row = asciiToNumber - 48 if (asciiToNumber < 58) else asciiToNumber - 55
-            #isFirstInputDoneAlready = True
-        #else:
-        #    move.append(row)
+            try:
+                asciiToNumber = ord(input(colored("Select row: ", 'cyan')).upper())
+                row = asciiToNumber - 48 if (asciiToNumber < 58) else asciiToNumber - 55
+            except:
+                print(colored("Invalid input", 'red', attrs=['bold']))
+
 
         if(column < 1 or column > state.cols):
-           
-            asciiToNumber = ord(input(colored("Select column: ", 'cyan')).upper())
-            column = asciiToNumber - 48 if (asciiToNumber < 58) else asciiToNumber - 55
-        
-        #else:
-        #    move.append(column)
+            try:
+                asciiToNumber = ord(input(colored("Select column: ", 'cyan')).upper())
+                column = asciiToNumber - 48 if (asciiToNumber < 58) else asciiToNumber - 55
+                isMoveValid = True
+            except:
+                print(colored("Invalid input", 'red', attrs=['bold']))
             # Assume that move is valid because cols and rows are in dimensions range:
-            isMoveValid = True
 
         pawnCurrentPosition = getPawnsCurrentPosition(player, state)
 
@@ -108,31 +129,45 @@ def playTurn(state:GameState):
                 row = 0
                 column = 0
 
-    while(isWallValid is False):
-        # TODO: Check if has walls left
-        wallType = ""
-        wallType = input("Select wall, Type v/h : ").lower()
-        wallRow = 0
-        wallCol = 0
-        asciiToNumber = ord(input(colored("Select wall's starting row: ", 'cyan')).upper())
-        wallRow = asciiToNumber - 48 if (asciiToNumber < 58) else asciiToNumber - 55
-        asciiToNumber = ord(input(colored("Select wall's starting column: ", 'cyan')).upper())
-        wallCol = asciiToNumber - 48 if (asciiToNumber < 58) else asciiToNumber - 55
+    # WALL PLACING  -------------------------------------------------------------------------           
+    if(state.walls[state.turn][0] > 0 or state.walls[state.turn][1] > 0):
+        while(isWallValid is False):
+            # TODO: Check if has walls left
+            wallType = ""
+            while(wallType != "v" and wallType != "h"):
+                wallType = input("Select wall, Type v/h : ").lower()
 
-        if wallType == "h":
+            wallRow = 0
+            wallCol = 0
+            asciiToNumber = ord(input(colored("Select wall's starting row: ", 'cyan')).upper())
+            wallRow = asciiToNumber - 48 if (asciiToNumber < 58) else asciiToNumber - 55
+            asciiToNumber = ord(input(colored("Select wall's starting column: ", 'cyan')).upper())
+            wallCol = asciiToNumber - 48 if (asciiToNumber < 58) else asciiToNumber - 55
+
             # If wall inputs are correct, try to place the wall
-            # state.cols - 1 => you can place horizontal wall only on second-to-last column
-            if(wallRow > 0 and wallRow < state.rows and wallCol < state.cols and wallCol > 0):
-                if tryToPlaceHorizontalWall(state, [wallRow, wallCol]) == True:
-                    isWallValid = True
+            if wallType == "h":
+
+                # If who plays has HORIZONTAL walls
+                if(state.walls[state.turn][0] > 0):
+                    if tryToPlaceHorizontalWall(state, [wallRow, wallCol]) == True:
+                        isWallValid = True
+                        state.walls[state.turn][0] -= 1 
+                    else:
+                        isWallValid = False
                 else:
-                    isWallValid = False
-        if wallType == "v":
-            if(wallRow > 0 and wallRow < state.rows and wallCol >0 and wallCol < state.rows):
-                if tryToPlaceVerticalWall(state, [wallRow, wallCol]) == True:
-                    isWallValid = True
+                    print(colored("You don't have any horizontal walls left",'red', attrs=['bold']))
+
+            if wallType == "v":
+
+                # If who plays has VERTICAL walls
+                if(state.walls[state.turn][1] > 0):
+                    if tryToPlaceVerticalWall(state, [wallRow, wallCol]) == True:
+                        isWallValid = True
+                        state.walls[state.turn][1] -= 1 
+                    else:
+                        isWallValid = False
                 else:
-                    isWallValid = False
+                    print(colored("You don't have any vertical walls left",'red', attrs=['bold']))
 
     return [[player], move, wall]
 
@@ -144,10 +179,13 @@ def exectuteTurn(state:GameState, turn):
 
     state.playingFields[turn[1][0]][turn[1][1]] = turn[0][0]
 
-    #Check if pawn moved from STARTING and set to XX / OO
+    #Check if pawn moved from STARTING and set to XS/ OS
     markStartingPosition(turn[0][0], currentPosition, state)
 
     setNewPawnPosition(turn[0][0], state, turn[1])
+    
+    # Switch turn
+    state.turn = "O" if state.turn == "X" else "X"
 
 def isGameOver(state:GameState):
     if(state.x1Pos == state.o1StartingPos
@@ -160,6 +198,6 @@ def isGameOver(state:GameState):
       or state.o1Pos == state.x2StartingPos
       or state.o2Pos == state.x1StartingPos
       or state.o2Pos == state.x2StartingPos):
-      print(colored("X IS A WINNER, CONGRATS!!!",'green', attrs=['bold']))
+      print(colored("O IS A WINNER, CONGRATS!!!",'green', attrs=['bold']))
       return True
     return False
